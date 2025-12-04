@@ -1,8 +1,9 @@
+import sys, os
+sys.path.append(os.path.dirname(__file__))
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-from .encryptor import load_store, save_store
+import encryptor
 from .portfolio import Portfolio
 from .market_data import prices_coingecko, fetch_fear_greed
 from .graphs import build_unrealized_bar, build_distribution_pie
