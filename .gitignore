@@ -1,0 +1,12 @@
+# Keys & encrypted store
+.chainguardian/
+*.key
+*.enc
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+dist/
+build/
