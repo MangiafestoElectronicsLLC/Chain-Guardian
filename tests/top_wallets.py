@@ -1,23 +1,16 @@
-from typing import List
+import matplotlib.pyplot as plt
 
-def get_whale_activity(store: dict) -> List[str]:
-    """
-    Displays tracked BTC/ETH addresses or Top-100 placeholders.
-    If you later integrate Blockchair/Etherscan, replace this with real inflow/outflow logic.
-    """
-    lines = []
-    tracked = store.get("tracked_addresses", {"btc": [], "eth": []})
-    btc = tracked.get("btc", [])
-    eth = tracked.get("eth", [])
-    if btc or eth:
-        lines.append("Tracked wallets:")
-        for a in btc[:50]:
-            lines.append(f"BTC | {a[:8]}... | activity: pending integration")
-        for a in eth[:50]:
-            lines.append(f"ETH | {a[:8]}... | activity: pending integration")
-    else:
-        lines.append("Top 100 whale wallets (demo):")
-        lines.append("BTC | 1A1zP1e... | inflow: — | outflow: — | exchange: —")
-        lines.append("ETH | 0x742d3... | inflow: — | outflow: — | exchange: —")
-        lines.append("Add addresses via Addresses to enable live tracking.")
-    return lines
+def build_unrealized_bar(stats):
+    labels,vals=[],[]
+    for sym,s in stats.items(): labels.append(sym); vals.append(s.get("unrealized_pct",0.0))
+    fig,ax=plt.subplots(figsize=(5,3)); ax.barh(labels,vals,color=["#2ca02c" if v>=0 else "#d62728" for v in vals])
+    ax.set_xlabel("% unrealized"); fig.tight_layout(); return fig
+
+def build_distribution_pie(stats):
+    labels,sizes=[],[]
+    for sym,s in stats.items():
+        val=s["remaining_qty"]*s["current_price"]
+        if val>0: labels.append(sym); sizes.append(val)
+    fig,ax=plt.subplots(figsize=(4,3))
+    if sizes: ax.pie(sizes,labels=labels,autopct="%1.1f%%",startangle=90)
+    ax.axis("equal"); return fig
