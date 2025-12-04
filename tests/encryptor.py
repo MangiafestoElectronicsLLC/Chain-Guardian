@@ -1,56 +1,36 @@
-import os
-import json
+import os, json
 from cryptography.fernet import Fernet
 from pathlib import Path
 from .config import APP_DIRNAME, STORE_FILENAME, KEY_FILENAME
 
-def _app_dir() -> Path:
+def _app_dir():
     p = Path.home() / APP_DIRNAME
     p.mkdir(parents=True, exist_ok=True)
     return p
 
-def _key_path() -> Path:
-    return _app_dir() / KEY_FILENAME
+def _key_path(): return _app_dir() / KEY_FILENAME
+def _store_path(): return _app_dir() / STORE_FILENAME
 
-def _store_path() -> Path:
-    return _app_dir() / STORE_FILENAME
-
-def _get_fernet() -> Fernet:
+def _get_fernet():
     kp = _key_path()
     if not kp.exists():
         kp.write_bytes(Fernet.generate_key())
-    key = kp.read_bytes()
-    return Fernet(key)
+    return Fernet(kp.read_bytes())
 
-def load_store() -> dict:
+def load_store():
     sp = _store_path()
     f = _get_fernet()
     if not sp.exists():
-        # initialize default store
-        store = {
-            "api_keys": {},
-            "settings": {"refresh_seconds": 30, "default_quote": "USDT", "profit_pct_to_take": 300.0},
-            "orders": [],  # list of dicts {id, asset, side, amount, price, exchange, timestamp, note, status}
-            "tracked_addresses": {"btc": [], "eth": []},
-            "whale_watch": {"btc": [], "eth": []}
-        }
+        store = {"api_keys": {}, "settings": {"refresh_seconds":30,"default_quote":"USDT","profit_pct_to_take":300.0}, "orders": []}
         save_store(store)
         return store
     try:
-        data = f.decrypt(sp.read_bytes())
-        return json.loads(data.decode("utf-8"))
+        return json.loads(f.decrypt(sp.read_bytes()).decode("utf-8"))
     except Exception:
-        # if decrypt fails, don't crash—create a new store (and keep the old file)
-        return {
-            "api_keys": {},
-            "settings": {"refresh_seconds": 30, "default_quote": "USDT", "profit_pct_to_take": 300.0},
-            "orders": [],
-            "tracked_addresses": {"btc": [], "eth": []},
-            "whale_watch": {"btc": [], "eth": []}
-        }
+        return {"api_keys": {}, "settings": {}, "orders": []}
 
-def save_store(store: dict) -> None:
+def save_store(store):
     sp = _store_path()
     f = _get_fernet()
-    blob = json.dumps(store, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    blob = json.dumps(store).encode("utf-8")
     sp.write_bytes(f.encrypt(blob))
