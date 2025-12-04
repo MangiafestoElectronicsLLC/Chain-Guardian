@@ -1,0 +1,20 @@
+[project]
+name = "chain-guardian"
+version = "0.1.0"
+description = "Chain Guardian - secure multi-wallet crypto monitoring with encrypted storage, whale tracking, and signals."
+authors = [{name = "Zachary"}]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+  "cryptography>=40.0.0",
+  "requests>=2.28.0",
+  "pandas>=2.0.0",
+  "matplotlib>=3.7.0",
+  "ccxt>=2.0.0",
+  "python-dotenv>=1.0.0"
+]
+
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
