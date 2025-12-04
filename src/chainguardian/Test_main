@@ -1,0 +1,98 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Chain Guardian")
+        self.geometry("1200x800")
+        self.store = load_store()
+        self.portfolio = Portfolio(self.store)
+        self.refresh_seconds = int(self.store.get("settings", {}).get("refresh_seconds", REFRESH_SECONDS_DEFAULT))
+        self._build_ui()
+        self._start_refresh()
+
+    def _build_ui(self):
+        # Top summary bar
+        top = ttk.Frame(self)
+        top.pack(fill=tk.X, padx=8, pady=8)
+
+        self.summary_total = self._summary_card(top, "Total value", "$0.00")
+        self.summary_24h = self._summary_card(top, "24h change", "0.00%")
+        self.summary_unreal = self._summary_card(top, "Unrealized P/L", "$0.00 (0.00%)")
+        self.summary_fng = self._summary_card(top, "Fear & Greed", "—")
+        top_right = ttk.Frame(top)
+        top_right.pack(side=tk.RIGHT)
+        ttk.Button(top_right, text="Refresh", command=self.manual_refresh).pack(side=tk.LEFT, padx=6)
+        ttk.Button(top_right, text="Orders", command=self.manage_orders).pack(side=tk.LEFT)
+        ttk.Button(top_right, text="Addresses", command=self.manage_addresses).pack(side=tk.LEFT, padx=6)
+        ttk.Button(top_right, text="API Keys", command=self.manage_api_keys).pack(side=tk.LEFT)
+        ttk.Label(top_right, text=f"Every {self.refresh_seconds}s").pack(side=tk.LEFT, padx=6)
+
+        # Main notebook
+        self.nb = ttk.Notebook(self)
+        self.nb.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+
+        # Portfolio tab
+        self.tab_portfolio = ttk.Frame(self.nb)
+        self.nb.add(self.tab_portfolio, text="Portfolio")
+        self._build_portfolio_tab(self.tab_portfolio)
+
+        # Whale tracking tab
+        self.tab_whales = ttk.Frame(self.nb)
+        self.nb.add(self.tab_whales, text="Whale Watch")
+        self._build_whale_tab(self.tab_whales)
+
+        # Status bar
+        self.status = ttk.Label(self, text="Ready")
+        self.status.pack(fill=tk.X)
+
+    def _summary_card(self, parent, title, value):
+        frm = ttk.Frame(parent, relief=tk.GROOVE, padding=8)
+        frm.pack(side=tk.LEFT, padx=6)
+        ttk.Label(frm, text=title, font=("Segoe UI", 10, "bold")).pack(anchor="w")
+        lbl = ttk.Label(frm, text=value, font=("Segoe UI", 12))
+        lbl.pack(anchor="w")
+        return lbl
+
+    def _build_portfolio_tab(self, parent):
+        # left: portfolio table
+        left = ttk.Frame(parent)
+        left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        cols = ["asset","qty","avg_cost","cur_price","chg_24h","total_value","unreal_d","unreal_pct","exchange","note"]
+        self.table = ttk.Treeview(left, columns=cols, show="headings")
+        for c, w in zip(cols, [120,90,90,90,80,110,110,90,100,160]):
+            self.table.heading(c, text=c.replace("_"," ").title(), command=lambda col=c: self._sort_table(col, False))
+            self.table.column(c, width=w, anchor=tk.CENTER)
+        self.table.pack(fill=tk.BOTH, expand=True)
+
+        # right: charts + Fear & Greed
+        right = ttk.Frame(parent)
+        right.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=8)
+
+        ttk.Label(right, text="Portfolio distribution").pack(anchor="w")
+        self.fig_pie = build_unrealized_bar({})  # you can replace with a pie builder
+        self.canvas_pie = FigureCanvasTkAgg(self.fig_pie, master=right)
+        self.canvas_pie.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+        ttk.Label(right, text="% Unrealized by asset").pack(anchor="w")
+        self.fig_bar = build_unrealized_bar({})
+        self.canvas_bar = FigureCanvasTkAgg(self.fig_bar, master=right)
+        self.canvas_bar.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def _build_whale_tab(self, parent):
+        ttk.Label(parent, text="BTC/ETH Top 100 Whale Wallets (24h inflow/outflow)").pack(anchor="w", padx=6, pady=6)
+        self.whale_text = tk.Text(parent, height=20)
+        self.whale_text.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
+
+    def _sort_table(self, col, reverse):
+        data = [(self.table.set(k, col), k) for k in self.table.get_children("")]
+        try:
+            data.sort(key=lambda t: float(t[0].replace("%","").replace("$","")), reverse=reverse)
+        except:
+            data.sort(reverse=reverse)
+        for i, (_, k) in enumerate(data):
+            self.table.move(k, "", i)
+        self.table.heading(col, command=lambda: self._sort_table(col, not reverse))
