@@ -1,75 +1,117 @@
-# Chain-Guardian
+Chain Guardian — Crypto Portfolio Tracker & Whale Watcher
+Chain Guardian is a modern, privacy‑respecting crypto portfolio tracker built with Streamlit, designed to give traders, builders, and analysts a clean, powerful interface for monitoring assets, tracking whale wallets, analyzing market signals, and visualizing performance — all in real time.
 
-A user-friendly, Tkinter-powered application for tracking crypto assets, monitoring whale wallets, analyzing real-time prices, visualizing portfolio gains/losses, and securely storing wallet data using Fernet encryption.
+This project is part of the Chainguard ecosystem by Mangiafesto Electronics LLC, focused on transparent, user‑controlled crypto tooling.
 
-Features
+🚀 Features
+📊 Dashboard
+Real‑time portfolio valuation
 
-Real-time crypto price tracking
-
-Tracks BTC/ETH top 100 whale wallets
-
-Built-in profit-taking logic (e.g., auto-alert at 300% gain)
+Unrealized P/L with percentage change
 
 Fear & Greed Index integration
 
-Easy GUI with charts & live portfolio metrics
+Auto‑refreshing data (configurable)
 
-Secure storage of wallet addresses and API keys using Fernet
+💼 Portfolio Management
+Add, edit, and delete accounts
 
-Auto-calculated average buy price, total value, and historical gains
+Track unlimited assets
 
-Works with hardware wallet public addresses (no private keys required)
+View historical performance
 
-# Chain Guardian Added Features
+Secure local storage using encryption (Fernet)
 
-Chain Guardian is a modular, encrypted, multi-wallet crypto monitoring toolkit:
-- Encrypted storage (Fernet) for API keys, addresses, and app data
-- Portfolio analytics (avg cost, realized/unrealized P&L)
-- Profit-take signals (configurable; default: 300% -> withdraw original investment)
-- Fear & Greed integration
-- Basic whale address tracking (BTC/ETH) via public APIs (Blockchair / Etherscan)
-- Tk GUI + Matplotlib helpers (starter app)
+🐋 Whale Watch
+Monitor large wallet addresses
 
-## Quick start
+Track inflows/outflows
 
-1. Clone repo:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/chain-guardian.git
-   cd chain-guardian
+Detect unusual activity
 
-2. Create venv and install:
+Perfect for on‑chain intelligence workflows
 
-python -m venv venv
-source venv/bin/activate # Windows: venv\Scripts\activate
+📈 Signals
+Market trend indicators
+
+Technical analysis signals
+
+Custom alerting logic (coming soon)
+
+🧾 Orders
+Log buys, sells, transfers
+
+Automatic P/L calculations
+
+Exportable transaction history (CSV support planned)
+
+🌍 Markets
+Real‑time price feeds
+
+Global market overview
+
+Top movers & trending assets
+
+⚙️ Settings
+Manage accounts
+
+Rename or delete profiles
+
+Configure refresh intervals
+
+Local‑only data handling for privacy
+
+🖥️ Tech Stack
+Component	Technology
+Frontend	Streamlit
+Backend	Python
+Data	Crypto APIs (CoinGecko, etc.)
+Storage	Encrypted local JSON (Fernet)
+Visualization	Plotly / Matplotlib
+Deployment	Streamlit Cloud / Local
+📦 Installation
+bash
+git clone https://github.com/yourusername/Chain-Guardian.git
+cd Chain-Guardian
 pip install -r requirements.txt
+streamlit run app.py
+🔐 Security & Privacy
+Chain Guardian is designed with user sovereignty in mind:
 
+No cloud databases
 
-3. Run the app:
+No tracking
 
-python -m chainguardian.main
+All wallet data is encrypted locally
 
+You control your keys, your accounts, and your history
 
+🛣️ Roadmap
+[ ] Multi‑exchange API syncing
 
-First run will create a directory ~/.chainguardian/ containing:
+[ ] Mobile‑friendly UI
 
-fernet.key (local encryption key) — do not commit
+[ ] Advanced whale analytics (heatmaps, clustering)
 
-store.enc (encrypted data store)
+[ ] Portfolio export/import
 
+[ ] Custom alert notifications
 
-Adding API keys & tracked addresses
+[ ] AI‑powered market summaries
 
-The GUI exposes a "Manage API Keys" dialog (or edit config later).
+🤝 Contributing
+Pull requests are welcome!
+If you’d like to contribute features, bug fixes, or documentation:
 
-For Etherscan: add under Etherscan key.
+Fork the repo
 
-For Blockchair: add key if you have one; otherwise paste addresses manually under Manage Addresses in the GUI.
+Create a feature branch
 
+Submit a PR with a clear description
 
-Security notes
+📜 License
+MIT License — open, permissive, and community‑friendly.
 
-Fernet key is stored locally. Back it up securely.
-
-Do not commit your keys, backups, or .env with secrets.
-
-The app is advisory-only by default. No live trading unless you wire CCXT order placement intentionally.
+⭐ Support the Project
+If Chain Guardian helps you track smarter or build better tools, consider starring the repo.
+It helps the project grow and supports open‑source crypto tooling.
